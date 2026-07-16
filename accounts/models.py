@@ -130,7 +130,7 @@ class CustomerApplication(models.Model):
               
         if not self.application_id:
             today = timezone.localdate()
-            date_prefix = today.strftime("%y%m%d")
+            date_prefix = today.strftime("%Y%m%d")
 
             last_application = self.__class__.objects.filter(
                 application_id__startswith=date_prefix
