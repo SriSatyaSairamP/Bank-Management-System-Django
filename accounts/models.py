@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator,MinLengthValidator
+from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 class Bank(models.Model):
 
@@ -122,16 +124,36 @@ class CustomerApplication(models.Model):
         related_name = "applications"
     )
     
-    application_id = models.CharField(max_length=10,unique=True,editable = False)
-    def save(self,*args,**kwargs):
-        
-        super().save(*args,**kwargs)
-        
+    application_id = models.CharField(max_length=12,unique=True,editable = False)
+    
+    def save(self,*args,**kwargs):        
+              
         if not self.application_id:
-            self.application_id = f"{self.id:06d}"
+            today = timezone.localdate()
+            date_prefix = today.strftime("%y%m%d")
 
-            super().save(update_fields=["application_id"])
+            last_application = self.__class__.objects.filter(
+                application_id__startswith=date_prefix
+            ).order_by("-application_id").first()
 
+            if last_application:
+                last_sequence = int(last_application.application_id[-4:])
+                new_sequence = last_sequence+1
+            else:
+                new_sequence=1
+            self.application_id = f"{date_prefix}{new_sequence:04d}"
+
+        branch=Branch.objects.get(
+            pin_code = self.current_pin_code)
+        if branch:
+            self.branch = branch
+        else:
+            raise ValidationError(
+                "No branch found for the entered PIN."
+            )
+        super().save(*args,**kwargs)
+
+            
     full_name = models.CharField(max_length=100,
                                  validators = [
                                      RegexValidator(
@@ -153,12 +175,13 @@ class CustomerApplication(models.Model):
     identity_proof_type = models.CharField(max_length=50)
     identity_id = models.CharField(max_length=12,unique=True,
                 validators= [
-                    MinLengthValidator(12),
+                    
                     RegexValidator(
                         regex =r'^\d{12}$',
                         message = "Identity ID must contain exactly 16 digits."
                     )
                 ])
+    # identity_document = models.FileField(...)
     permanent_address = models.CharField(max_length=255)
     permanent_city = models.CharField(max_length=100)
     permanent_state=models.CharField(max_length=100)
