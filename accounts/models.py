@@ -235,3 +235,52 @@ class CustomerApplication(models.Model):
         return (
             f"{self.full_name}"
         )
+    
+
+class Customer(models.Model):
+    application = models.OneToOneField(
+        CustomerApplication,on_delete=models.PROTECT,
+        related_name="customer"
+    )
+
+    branch = models.ForeignKey(
+        Branch,
+        on_delete=models.PROTECT,
+        related_name="customers"
+    )
+    customer_id = models.CharField(max_length=14,
+                                   unique=True,
+                                   editable=False)
+
+
+    def save(self,*args,**kwargs):
+
+        if not self.customer_id:
+            bank_code = self.branch.bank.bank_code
+            branch_code = self.branch.branch_code
+
+            last_customer= (
+                            self.__class__.objects.filter(branch=self.branch)
+                            .order_by("-customer_id").first()
+            )
+
+            if last_customer:
+                last_sequence = int(last_customer.customer_id[-6:])
+                new_sequence =last_sequence+1
+
+            else:
+                new_sequence = 1
+                        
+            self.customer_id = f"{bank_code}{branch_code}{new_sequence:06d}"        
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+
+        db_table = "customer"
+        ordering = ["customer_id"]
+        verbose_name = "Customer"
+        verbose_name_plural = "customers"
+
+    def __str__(self):
+        return f"{self.customer_id} - {self.application.full_name}"
