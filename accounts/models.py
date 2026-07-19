@@ -143,14 +143,17 @@ class CustomerApplication(models.Model):
                 new_sequence=1
             self.application_id = f"{date_prefix}{new_sequence:04d}"
 
-        branch=Branch.objects.get(
-            pin_code = self.current_pin_code)
-        if branch:
-            self.branch = branch
-        else:
-            raise ValidationError(
-                "No branch found for the entered PIN."
+        
+        
+        try:
+            self.branch = Branch.objects.get(
+                pin_code=self.current_pin_code
             )
+        except Branch.DoesNotExist:
+            raise ValidationError({ "current_pin_code" :
+                "No branch found for the entered PIN."
+            })
+
         super().save(*args,**kwargs)
 
             
