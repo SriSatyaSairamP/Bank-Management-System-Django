@@ -86,13 +86,25 @@ class Branch(models.Model):
         ]
     )
 
+    branch_email = models.EmailField(unique=True)
+
+    branch_mobile= models.CharField(max_length=10,
+                                    unique =True,
+                                    
+                                    validators= [
+                                        RegexValidator(
+                                            regex=r'^\d{10}$',
+                                            message = "Branch mobile number must contain exactly 10 digits."
+                                        )
+                                    ])
+
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "branches"
-        ordering = ["bank", "branch_name"]
+        ordering = ["bank", "branch_code"]
         verbose_name = "Branch"
         verbose_name_plural = "Branches"
 
