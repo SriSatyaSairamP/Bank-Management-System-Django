@@ -1,7 +1,29 @@
 from django.contrib import admin
 from .models import Bank,Branch,CustomerApplication,Customer
 
-admin.site.register(Bank)
-admin.site.register(Branch)
-admin.site.register(CustomerApplication)
-admin.site.register(Customer)
+
+@admin.register(Bank)
+class BankAdmin(admin.ModelAdmin):
+    list_display = ("bank_name","bank_code","is_active")
+
+@admin.register(Branch)
+class BranchAdmin(admin.ModelAdmin):
+    list_disply = ("branch_name","bank","branch_code","ifsc_code","is_active")
+
+@admin.register(CustomerApplication)
+class CustomerApplicationAdmin(admin.ModelAdmin):
+    list_display(
+        "application_id",
+        "full_name",
+        "status",
+        "branch",
+        "created_at"
+    )
+
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display(
+        "custoomer_id",
+        "application",
+        "branch"
+    )
