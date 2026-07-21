@@ -8,11 +8,11 @@ class BankAdmin(admin.ModelAdmin):
 
 @admin.register(Branch)
 class BranchAdmin(admin.ModelAdmin):
-    list_disply = ("branch_name","bank","branch_code","ifsc_code","is_active")
+    list_display = ("branch_name","bank","branch_code","ifsc_code","is_active")
 
 @admin.register(CustomerApplication)
 class CustomerApplicationAdmin(admin.ModelAdmin):
-    list_display(
+    list_display=(
         "application_id",
         "full_name",
         "status",
@@ -22,8 +22,8 @@ class CustomerApplicationAdmin(admin.ModelAdmin):
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display(
-        "custoomer_id",
+    list_display=(
+        "customer_id",
         "application",
         "branch"
     )
