@@ -10,6 +10,8 @@ class CustomerApplicationForm(forms.ModelForm):
             "branch",
             "status",
             "remarks",
+            "created_by",
             "created_at",
             "updated_at",
         ]
+ 
