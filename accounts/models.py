@@ -11,7 +11,7 @@ class Bank(models.Model):
         unique =True,
         validators = [
             RegexValidator(
-                regex= r'^[A-Za-z ]+$',
+                regex= r'^[A-Za-z]+(?: [A-Za-z]+)*$',
                 message = "Bank name must contain only alphabets and spaces."
             )
         ]
@@ -48,11 +48,11 @@ class Branch(models.Model):
         related_name= "branches"
     )
 
-    branch_name = models.CharField(max_length=100,unique =True)
+    branch_name = models.CharField(max_length=100)
 
     branch_code =models. CharField(
         max_length = 4,
-        unique = True,
+        
         validators = [
             RegexValidator(
                 regex=r'^\d{4}$',
@@ -60,7 +60,7 @@ class Branch(models.Model):
             )
         ]
     )
-
+ 
     ifsc_code = models.CharField(
         max_length =11,
         unique =True,
@@ -173,12 +173,13 @@ class CustomerApplication(models.Model):
     full_name = models.CharField(max_length=100,
                                  validators = [
                                      RegexValidator(
-                                         regex = r'^[A-Za-z ]+$',
-                                         message="Full name must contain only alphabets and spaces."
+                                         regex = r'^[A-Za-z]+(?: [A-Za-z]+)*$',
+                                         message="Full name must contain only alphabets with single spaces between words."
                                      )
                                  ])
     date_of_birth =models.DateField()
     mobile_number= models.CharField(max_length=10,
+                                    
                                     validators=[
                                         MinLengthValidator(10),
                                         RegexValidator(
@@ -304,7 +305,7 @@ class Customer(models.Model):
         db_table = "customer"
         ordering = ["customer_id"]
         verbose_name = "Customer"
-        verbose_name_plural = "customers"
+        verbose_name_plural = "Customers"
 
     def __str__(self):
         return f"{self.customer_id} - {self.application.full_name}"
@@ -346,7 +347,7 @@ class ApplicationHistory(models.Model):
     class Meta:
         ordering = ["-created_at"]
         verbose_name = "Application History"
-        verbose_name_plural = "Application_History"
+        verbose_name_plural = "Application Histories"
 
 
 
